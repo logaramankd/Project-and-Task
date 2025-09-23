@@ -58,6 +58,7 @@ const Projects = () => {
         }
     };
 
+    const [assignedUsers, setassigneduser] = useState([])
     // Save project (add or edit)
     const handleSave = () => {
         const form = document.getElementById("project-form");
@@ -66,7 +67,7 @@ const Projects = () => {
             id: editingProject ? editingProject.id : Date.now(),
             name: formData.get("name"),
             description: formData.get("description"),
-            assignedUsers: formData.getAll("assignedUsers"),
+            assignedUsers: assignedUsers,
             status: formData.get("status"),
             priority: formData.get("priority"),
             startDate: formData.get("startDate"),
@@ -174,6 +175,8 @@ const Projects = () => {
                             select
                             name="assignedUsers"
                             label="Assign Users"
+                            value={assignedUsers}
+                            onChange={(e) => setassigneduser(e.target.value)}
                             defaultValue={editingProject?.assignedUsers || []}
                             SelectProps={{ multiple: true }}
                         >
