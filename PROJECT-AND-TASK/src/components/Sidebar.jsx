@@ -38,9 +38,6 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
     >
       {/* Top Section */}
       <Box>
-        <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, color: "#80cbc4" }}>
-          Admin Panel
-        </Typography>
         <Typography variant="subtitle1" sx={{ mb: 3, color: "#b0bec5" }}>
           Welcome, {username}
         </Typography>

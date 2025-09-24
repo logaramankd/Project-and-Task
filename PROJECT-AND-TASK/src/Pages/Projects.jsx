@@ -1,4 +1,3 @@
-// src/pages/Projects.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -20,15 +19,49 @@ import {
   TextField,
   MenuItem,
   AvatarGroup,
+  Card,
+  CardContent,
+  CardActions,
+  useMediaQuery,
+  Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { users } from "../utils/users";
 import { useSelector, useDispatch } from 'react-redux';
 import { addProject, deleteProject, updateProject } from "../redux/slices/projectsSlice";
+import { useTheme } from "@mui/material/styles";
 
 const statusOptions = ["Not Started", "In Progress", "Completed"];
 const priorityOptions = ["Low", "Medium", "High"];
+
+// helper for status color
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Not Started":
+      return "default"; // gray
+    case "In Progress":
+      return "warning"; // yellow/orange
+    case "Completed":
+      return "success"; // green
+    default:
+      return "default";
+  }
+};
+
+// helper for priority color
+const getPriorityColor = (priority) => {
+  switch (priority) {
+    case "Low":
+      return "info"; // blue
+    case "Medium":
+      return "secondary"; // purple
+    case "High":
+      return "error"; // red
+    default:
+      return "default";
+  }
+};
 
 const Projects = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -81,10 +114,14 @@ const Projects = () => {
     handleCloseModal();
   };
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: "100vh", width: "100%" }}>
       <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>Projects</Typography>
 
+      {/* Top actions */}
       <Box sx={{ display: 'flex', flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "stretch", sm: "center" }, gap: 2, mb: 2 }}>
         {isAdmin && (
           <Button
@@ -105,21 +142,22 @@ const Projects = () => {
         />
       </Box>
 
-      <TableContainer component={Paper} sx={{ bgcolor: "#ffffff", borderRadius: 2, boxShadow: 3, overflowX: "auto" }}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow sx={{ bgcolor: "#1976d2" }}>
-              {["Name", "Description", "Assigned Users", "Status", "Priority", "Start Date", "End Date", "Actions"].map(header => (
-                <TableCell key={header} sx={{ color: "#fff", fontWeight: 600 }}>{header}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {displayedProjects.map((project) => (
-              <TableRow key={project.id} sx={{ "&:hover": { bgcolor: "#f1f1f1" } }}>
-                <TableCell>{project.name}</TableCell>
-                <TableCell>{project.description}</TableCell>
-                <TableCell>
+      {/* Responsive rendering */}
+      {isMobile ? (
+        // 📱 Card view for mobile
+        <Box sx={{ display: "grid", gap: 2 }}>
+          {displayedProjects.map((project) => (
+            <Card key={project.id} sx={{ borderRadius: 2, boxShadow: 3 }}>
+              <CardContent>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>{project.name}</Typography>
+                <Typography variant="body2" color="text.secondary">{project.description}</Typography>
+
+                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+                  <Chip label={project.status} color={getStatusColor(project.status)} size="small" />
+                  <Chip label={project.priority} color={getPriorityColor(project.priority)} size="small" />
+                </Box>
+
+                <Box sx={{ mt: 1 }}>
                   <AvatarGroup max={3}>
                     {project.assignedUsers.map((username) => {
                       const user = users.find(u => u.username === username);
@@ -127,30 +165,78 @@ const Projects = () => {
                       return <Avatar key={user.id} src={user.img} alt={user.username} />;
                     })}
                   </AvatarGroup>
-                </TableCell>
-                <TableCell>{project.status}</TableCell>
-                <TableCell>{project.priority}</TableCell>
-                <TableCell>{project.startDate}</TableCell>
-                <TableCell>{project.endDate}</TableCell>
-                <TableCell>
-                  {isAdmin && (
-                    <>
-                      <IconButton color="primary" onClick={() => handleOpenModal(project)}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => handleDelete(project.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </Box>
 
-      {/* Add/Edit Modal */}
+                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                  🗓 {project.startDate} → {project.endDate}
+                </Typography>
+              </CardContent>
+              {isAdmin && (
+                <CardActions>
+                  <IconButton color="primary" onClick={() => handleOpenModal(project)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(project.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </CardActions>
+              )}
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        // 💻 Table view for desktop
+        <TableContainer component={Paper} sx={{ bgcolor: "#ffffff", borderRadius: 2, boxShadow: 3, overflowX: "auto" }}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow sx={{ bgcolor: "#1976d2" }}>
+                {["Name", "Description", "Assigned Users", "Status", "Priority", "Start Date", "End Date", "Actions"].map(header => (
+                  <TableCell key={header} sx={{ color: "#fff", fontWeight: 600 }}>{header}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {displayedProjects.map((project) => (
+                <TableRow key={project.id} sx={{ "&:hover": { bgcolor: "#f1f1f1" } }}>
+                  <TableCell>{project.name}</TableCell>
+                  <TableCell>{project.description}</TableCell>
+                  <TableCell>
+                    <AvatarGroup max={3}>
+                      {project.assignedUsers.map((username) => {
+                        const user = users.find(u => u.username === username);
+                        if (!user) return null;
+                        return <Avatar key={user.id} src={user.img} alt={user.username} />;
+                      })}
+                    </AvatarGroup>
+                  </TableCell>
+                  <TableCell>
+                    <Chip label={project.status} color={getStatusColor(project.status)} size="small" />
+                  </TableCell>
+                  <TableCell>
+                    <Chip label={project.priority} color={getPriorityColor(project.priority)} size="small" />
+                  </TableCell>
+                  <TableCell>{project.startDate}</TableCell>
+                  <TableCell>{project.endDate}</TableCell>
+                  <TableCell>
+                    {isAdmin && (
+                      <>
+                        <IconButton color="primary" onClick={() => handleOpenModal(project)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleDelete(project.id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {/* Add/Edit Modal (unchanged) */}
       {isAdmin && (
         <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="sm">
           <DialogTitle>{editingProject ? "Edit Project" : "Add Project"}</DialogTitle>
