@@ -27,57 +27,74 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
     <Box
       sx={{
         width: { xs: 220, sm: 240 },
-        bgcolor: "#F9F5F0",
-        color: "black",
+        bgcolor: "#263238", // professional dark gray/blue
+        color: "#ffffff",
         height: "100%",
         p: 2,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        borderRight: '1px solid black'
       }}
     >
+      {/* Top Section */}
       <Box>
-        <Typography variant="h6" sx={{ mb: 3 }}>
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: 600, color: "#80cbc4" }}>
           Admin Panel
         </Typography>
-        <Typography variant="h5" sx={{ mb: 1 }}>
-          Welcome {username}
+        <Typography variant="subtitle1" sx={{ mb: 3, color: "#b0bec5" }}>
+          Welcome, {username}
         </Typography>
 
-        {menuItems.map((item) => (
-          <Button
-            key={item.name}
-            sx={{
-              color: location.pathname === item.path ? "#1976d2" : "black",
-              justifyContent: "flex-start",
-              gap: 2,
-              mb: 1,
-              bgcolor: location.pathname === item.path ? "#e0e0e0" : "transparent",
-            }}
-            fullWidth
-            onClick={() => {
-              navigate(item.path);
-              if (mobileopen) handleSidebar(); // close sidebar on mobile
-            }}
-          >
-            <IconButton>{item.icon}</IconButton>
-            {item.name}
-          </Button>
-        ))}
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Button
+              key={item.name}
+              sx={{
+                color: isActive ? "#263238" : "#eceff1",  // active text dark, default light
+                bgcolor: isActive ? "#80cbc4" : "transparent", // teal accent for active
+                justifyContent: "flex-start",
+                gap: 2,
+                mb: 1,
+                borderRadius: 1,
+                textTransform: "none",
+                "&:hover": {
+                  bgcolor: isActive ? "#4db6ac" : "rgba(255,255,255,0.1)", // subtle hover
+                },
+              }}
+              fullWidth
+              onClick={() => {
+                navigate(item.path);
+                if (mobileopen) handleSidebar();
+              }}
+            >
+              <IconButton sx={{ color: isActive ? "#263238" : "#eceff1" }}>
+                {item.icon}
+              </IconButton>
+              {item.name}
+            </Button>
+          );
+        })}
       </Box>
 
-      <Box>
-        <Button
-          variant="contained"
-          onClick={handleLogout}
-          fullWidth
-          sx={{ gap: 2, bgcolor: "#e57373" }}
-        >
-          <IconButton><LogoutIcon /></IconButton>
-          Logout
-        </Button>
-      </Box>
+      {/* Bottom Logout */}
+      <Button
+        variant="contained"
+        onClick={handleLogout}
+        fullWidth
+        sx={{
+          gap: 2,
+          bgcolor: "#d32f2f",       // professional deep red
+          "&:hover": { bgcolor: "#b71c1c" },
+          color: "#fff",
+          textTransform: "none",
+        }}
+      >
+        <IconButton sx={{ color: "#fff" }}>
+          <LogoutIcon />
+        </IconButton>
+        Logout
+      </Button>
     </Box>
   );
 
@@ -102,7 +119,7 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", sm: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 200 },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 220 },
         }}
       >
         {drawerContent}
@@ -110,4 +127,5 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
     </>
   );
 };
-export default Sidebar
+
+export default Sidebar;

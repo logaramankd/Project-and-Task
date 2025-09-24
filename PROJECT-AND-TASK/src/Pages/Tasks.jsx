@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Grid,
@@ -7,46 +7,38 @@ import {
   Button,
   Select,
   MenuItem,
+  FormControl,
+  InputLabel,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
 } from "@mui/material";
-import { users } from "../utils/users";
+import { useSelector, useDispatch } from "react-redux";
+import { addTask, updateTask, deleteTask, selectProjects } from "../redux/slices/projectsSlice";
 
 const Tasks = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   const isAdmin = loggedInUser?.role === "admin";
+  const projects = useSelector(selectProjects);
+  const dispatch = useDispatch();
 
-  const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState("all");
-
-  // Modal state
   const [openModal, setOpenModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskAssignedUser, setTaskAssignedUser] = useState("");
   const [taskStatus, setTaskStatus] = useState("Pending");
   const [taskPriority, setTaskPriority] = useState("Medium");
 
-  // Filters
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterUser, setFilterUser] = useState("");
+  const [mobileStatus, setMobileStatus] = useState("Pending"); // mobile only
 
-  useEffect(() => {
-    const storedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    setProjects(storedProjects);
-  }, []);
+  const selectedProject = projects.find((p) => p.id === Number(selectedProjectId));
 
-  const selectedProject = projects.find(p => p.id === Number(selectedProjectId));
-
-  const updateProjects = updatedProjects => {
-    setProjects(updatedProjects);
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
-  };
-
-  // Add Task (Admin only)
+  // Add Task
   const handleAddTask = () => {
     if (!selectedProject || !taskTitle || !taskAssignedUser) return;
 
@@ -57,11 +49,8 @@ const Tasks = () => {
       status: taskStatus,
       priority: taskPriority,
     };
+    dispatch(addTask({ projectId: selectedProject.id, task: newTask }));
 
-    const updatedProjects = projects.map(p =>
-      p.id === selectedProject.id ? { ...p, tasks: [...p.tasks, newTask] } : p
-    );
-    updateProjects(updatedProjects);
     setOpenModal(false);
     setTaskTitle("");
     setTaskAssignedUser("");
@@ -69,40 +58,35 @@ const Tasks = () => {
     setTaskPriority("Medium");
   };
 
-  // Edit Task (Admin & Employee: status update)
+  // Edit Task
   const handleEditTask = (taskId, projectId, newStatus = null) => {
-    const updatedProjects = projects.map(p =>
-      p.id === projectId
-        ? {
-            ...p,
-            tasks: p.tasks.map(t =>
-              t.id === taskId
-                ? isAdmin && !newStatus
-                  ? { ...t, title: prompt("Edit Task Title", t.title) || t.title }
-                  : { ...t, status: newStatus }
-                : t
-            ),
-          }
-        : p
-    );
-    updateProjects(updatedProjects);
+    const project = projects.find((p) => p.id === projectId);
+    const task = project.tasks.find((t) => t.id === taskId);
+    if (!task) return;
+
+    const updatedTask = { ...task };
+    if (isAdmin && !newStatus) {
+      const newTitle = prompt("Edit Task Title", task.title);
+      if (!newTitle) return;
+      updatedTask.title = newTitle;
+    } else if (newStatus) {
+      updatedTask.status = newStatus;
+    }
+    dispatch(updateTask({ projectId, task: updatedTask }));
   };
 
-  // Delete Task (Admin only)
+  // Delete Task
   const handleDeleteTask = (taskId, projectId) => {
-    const updatedProjects = projects.map(p =>
-      p.id === projectId ? { ...p, tasks: p.tasks.filter(t => t.id !== taskId) } : p
-    );
-    updateProjects(updatedProjects);
+    dispatch(deleteTask({ projectId, taskId }));
   };
 
-  // Tasks to display (filtered & role-based)
+  // Tasks to display
   const tasksToShow =
     selectedProjectId === "all"
-      ? projects.flatMap(p => (p.tasks || []).map(t => ({ ...t, projectId: p.id, projectName: p.name })))
-      : selectedProject?.tasks.map(t => ({ ...t, projectId: selectedProject.id, projectName: selectedProject.name })) || [];
+      ? projects.flatMap((p) => (p.tasks || []).map((t) => ({ ...t, projectId: p.id, projectName: p.name })))
+      : selectedProject?.tasks.map((t) => ({ ...t, projectId: selectedProject.id, projectName: selectedProject.name })) || [];
 
-  const filteredTasks = tasksToShow.filter(task => {
+  const filteredTasks = tasksToShow.filter((task) => {
     if (!isAdmin && task.assignedUser !== loggedInUser.username) return false;
     return (
       (!filterStatus || task.status === filterStatus) &&
@@ -117,146 +101,256 @@ const Tasks = () => {
         Task Management
       </Typography>
 
-      {/* Top Section: Project + Filters */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 2, mb: 3 }}>
-        <select className="custom-select" value={selectedProjectId} onChange={e => setSelectedProjectId(e.target.value)}>
-          <option value="all">All Projects</option>
-          {projects.map(p => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
+      {/* Filters Section */}
+      <Grid container spacing={2} sx={{ mb: 3, p: 2, bgcolor: "#fff", borderRadius: 2, boxShadow: 2 }}>
+        <Grid item xs={12} sm={3}>
+          <FormControl fullWidth>
+            <InputLabel>Project</InputLabel>
+            <Select
+              value={selectedProjectId}
+              label="Project"
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              sx={{ "& .MuiSelect-select": { bgcolor: "#f0f0f0", color: "#000" } }}
+            >
+              <MenuItem value="all">All Projects</MenuItem>
+              {projects.map((p) => (
+                <MenuItem key={p.id} value={p.id}>
+                  {p.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
 
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <select className="custom-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-            <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
+        <Grid item xs={12} sm={2}>
+          <FormControl sx={{ minWidth: 100 }}>
+            <InputLabel>Priority</InputLabel>
+            <Select
+              autoWidth
+              value={filterPriority}
+              label="Priority"
+              onChange={(e) => setFilterPriority(e.target.value)}
+              sx={{ "& .MuiSelect-select": { bgcolor: "#f0f0f0", color: "#000" } }}
+            >
+              <MenuItem value="">All Priority</MenuItem>
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-          <select className="custom-select" value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
-            <option value="">All Priority</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-
-          {isAdmin && (
-            <select className="custom-select" value={filterUser} onChange={e => setFilterUser(e.target.value)}>
-              <option value="">All Users</option>
-              {selectedProjectId === "all"
-                ? [...new Set(projects.flatMap(p => p.assignedUsers))].map(u => (
-                    <option key={u} value={u}>{u}</option>
+        {isAdmin && (
+          <Grid item xs={12} sm={3}>
+            <FormControl sx={{ minWidth: 100 }}>
+              <InputLabel>User</InputLabel>
+              <Select
+                value={filterUser}
+                label="User"
+                onChange={(e) => setFilterUser(e.target.value)}
+                sx={{ "& .MuiSelect-select": { bgcolor: "#f0f0f0", color: "#000" } }}
+              >
+                <MenuItem value="">All Users</MenuItem>
+                {selectedProjectId === "all"
+                  ? [...new Set(projects.flatMap((p) => p.assignedUsers || []))].map((u) => (
+                    <MenuItem key={u} value={u}>
+                      {u}
+                    </MenuItem>
                   ))
-                : selectedProject?.assignedUsers.map(u => (
-                    <option key={u} value={u}>{u}</option>
-                  ))
-              }
-            </select>
-          )}
-        </Box>
-      </Box>
+                  : selectedProject?.assignedUsers.map((u) => (
+                    <MenuItem key={u} value={u}>
+                      {u}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        )}
+      </Grid>
 
-      {/* Admin: Add Task Modal Button */}
+      {/* Add Task Button */}
       {isAdmin && selectedProjectId !== "all" && selectedProject && (
-        <Button variant="contained" sx={{ mb: 3 }} onClick={() => setOpenModal(true)}>
+        <Button
+          variant="contained"
+          sx={{ mb: 3, backgroundColor: "#f44336", "&:hover": { backgroundColor: "#d32f2f" } }}
+          onClick={() => setOpenModal(true)}
+        >
           Add Task
         </Button>
       )}
 
-      {/* Task List */}
-      <Grid container spacing={2}>
-        {filteredTasks.length === 0 && <Typography>No tasks found</Typography>}
-        {filteredTasks.map(task => (
-          <Grid item xs={12} sm={6} md={4} key={task.id}>
-            <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 2 }}>
-              {selectedProjectId === "all" && (
-                <Typography variant="caption" sx={{ color: "gray" }}>{task.projectName}</Typography>
-              )}
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>{task.title}</Typography>
-              <Typography variant="body2">Assigned: {task.assignedUser}</Typography>
+      {/* Task Cards */}
+      <Box sx={{ p: 2 }}>
+        {/* Mobile Status Selector */}
+        <Box sx={{ display: { xs: "block", sm: "none" }, mb: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select value={mobileStatus} onChange={(e) => setMobileStatus(e.target.value)}>
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="In Progress">In Progress</MenuItem>
+              <MenuItem value="Completed">Completed</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
 
-              {/* Status (editable by employee if assigned) */}
-              {(isAdmin || loggedInUser.username === task.assignedUser) ? (
-                <select
-                  className="custom-select"
-                  value={task.status}
-                  onChange={e => handleEditTask(task.id, task.projectId, e.target.value)}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 3,
+            justifyContent: "space-between",
+            flexDirection: { xs: "column", sm: "row" },
+          }}
+        >
+          {["Pending", "In Progress", "Completed"].map((status, index) => {
+            if (window.innerWidth < 600 && status !== mobileStatus) return null; // mobile only selected status
+
+            return (
+              <Box
+                key={status}
+                sx={{
+                  flex: 1,
+                  minWidth: 250,
+                  bgcolor: "#f7f7f7",
+                  borderRadius: 2,
+                  p: 2,
+                  maxHeight: "80vh",
+                  overflowY: "auto",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 2,
+                    textAlign: "center",
+                    border: "1px solid black",
+                    fontWeight: 600,
+                    bgcolor:
+                      status === "Pending"
+                        ? "orange"
+                        : status === "In Progress"
+                          ? "yellow"
+                          : "green",
+                  }}
                 >
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              ) : (
-                <Typography variant="body2">Status: {task.status}</Typography>
-              )}
+                  {status}
+                </Typography>
 
-              <Typography variant="body2" sx={{ mb: 1 }}>Priority: {task.priority}</Typography>
+                {filteredTasks
+                  .filter((task) => task.status === status)
+                  .map((task) => (
+                    <Paper
+                      key={task.id}
+                      sx={{
+                        p: 2,
+                        mb: 2,
+                        borderRadius: 2,
+                        width: "100%",
+                        minHeight: 200,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        transition: "0.3s",
+                        "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
+                      }}
+                    >
+                      <Box>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                          {selectedProjectId === "all" && <Typography variant="subtitle2">{task.projectName}</Typography>}
+                          <Typography variant="caption" sx={{ bgcolor: "gainsboro", p: 1, borderRadius: 2 }}>
+                            24hrs ago
+                          </Typography>
+                        </Box>
 
-              {/* Admin: Edit/Delete */}
-              {isAdmin && (
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Button size="small" variant="outlined" onClick={() => handleEditTask(task.id, task.projectId)}>Edit</Button>
-                  <Button size="small" variant="outlined" color="error" onClick={() => handleDeleteTask(task.id, task.projectId)}>Delete</Button>
-                </Box>
-              )}
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            mb: 1,
+                            fontSize: "0.9rem",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {task.title} <span style={{ fontWeight: 600 }}>▼</span>
+                        </Typography>
+
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          Assigned: {task.assignedUser}
+                        </Typography>
+
+                        <FormControl fullWidth sx={{ mb: 1 }}>
+                          <Select value={task.status} onChange={(e) => handleEditTask(task.id, task.projectId, e.target.value)}>
+                            <MenuItem value="Pending">Pending</MenuItem>
+                            <MenuItem value="In Progress">In Progress</MenuItem>
+                            <MenuItem value="Completed">Completed</MenuItem>
+                          </Select>
+                        </FormControl>
+
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          Priority: {task.priority}
+                        </Typography>
+                      </Box>
+
+                      {isAdmin && (
+                        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+                          <Button size="small" variant="contained" onClick={() => handleEditTask(task.id, task.projectId)}>
+                            Edit
+                          </Button>
+                          <Button size="small" variant="outlined" color="error" onClick={() => handleDeleteTask(task.id, task.projectId)}>
+                            Delete
+                          </Button>
+                        </Box>
+                      )}
+                    </Paper>
+                  ))}
+              </Box>
+
+            );
+          })}
+        </Box>
+      </Box>
 
       {/* Add Task Modal */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="sm">
         <DialogTitle>Add Task</DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-          <TextField
-            label="Task Title"
-            value={taskTitle}
-            onChange={e => setTaskTitle(e.target.value)}
-            fullWidth
-          />
-          <Select
-            value={taskAssignedUser}
-            onChange={e => setTaskAssignedUser(e.target.value)}
-            displayEmpty
-          >
-            <MenuItem value="">Select User</MenuItem>
-            {selectedProject?.assignedUsers.map(u => (
-              <MenuItem key={u} value={u}>{u}</MenuItem>
-            ))}
-          </Select>
-          <Select value={taskStatus} onChange={e => setTaskStatus(e.target.value)}>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="In Progress">In Progress</MenuItem>
-            <MenuItem value="Completed">Completed</MenuItem>
-          </Select>
-          <Select value={taskPriority} onChange={e => setTaskPriority(e.target.value)}>
-            <MenuItem value="Low">Low</MenuItem>
-            <MenuItem value="Medium">Medium</MenuItem>
-            <MenuItem value="High">High</MenuItem>
-          </Select>
+          <TextField label="Task Title" value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} fullWidth />
+          <FormControl fullWidth>
+            <InputLabel>Assign User</InputLabel>
+            <Select value={taskAssignedUser} onChange={(e) => setTaskAssignedUser(e.target.value)}>
+              {selectedProject?.assignedUsers.map((u) => (
+                <MenuItem key={u} value={u}>
+                  {u}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select value={taskStatus} onChange={(e) => setTaskStatus(e.target.value)}>
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="In Progress">In Progress</MenuItem>
+              <MenuItem value="Completed">Completed</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel>Priority</InputLabel>
+            <Select value={taskPriority} onChange={(e) => setTaskPriority(e.target.value)}>
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleAddTask}>Add Task</Button>
+          <Button variant="contained" onClick={handleAddTask}>
+            Add Task
+          </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Custom CSS */}
-      <style>
-        {`
-          .custom-select, .custom-input {
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-family: 'Josefin Sans', sans-serif;
-            min-width: 150px;
-          }
-          .custom-input {
-            flex: 1 1 200px;
-          }
-        `}
-      </style>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 // src/pages/Projects.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -23,8 +23,9 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { projects as initialProjects } from "../utils/projects";
 import { users } from "../utils/users";
+import { useSelector, useDispatch } from 'react-redux';
+import { addProject, deleteProject, updateProject } from "../redux/slices/projectsSlice";
 
 const statusOptions = ["Not Started", "In Progress", "Completed"];
 const priorityOptions = ["Low", "Medium", "High"];
@@ -33,25 +34,17 @@ const Projects = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   const isAdmin = loggedInUser?.role === "admin";
 
-  const [projects, setProjects] = useState(() => {
-    const saved = localStorage.getItem("projects");
-    return saved ? JSON.parse(saved) : initialProjects;
-  });
+  const projects = useSelector(state => state.projects.projects);
+  const dispatch = useDispatch();
 
   const [openModal, setOpenModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [assignedUsers, setAssignedUsers] = useState([]);
+  const [searchProject, setSearchProject] = useState("");
 
-  useEffect(() => {
-    localStorage.setItem("projects", JSON.stringify(projects));
-  }, [projects]);
+  const displayedProjects = (isAdmin ? projects : projects.filter(p => p.assignedUsers.includes(loggedInUser.username)))
+    .filter(p => p.name.toLowerCase().includes(searchProject.toLowerCase()));
 
-  // Filter projects for employee
-  const displayedProjects = isAdmin
-    ? projects
-    : projects.filter((p) => p.assignedUsers.includes(loggedInUser.username));
-
-  // Open modal for add/edit
   const handleOpenModal = (project = null) => {
     setEditingProject(project);
     setAssignedUsers(project?.assignedUsers || []);
@@ -64,14 +57,12 @@ const Projects = () => {
     setOpenModal(false);
   };
 
-  // Delete project
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
-      setProjects(projects.filter((p) => p.id !== id));
+      dispatch(deleteProject(id));
     }
   };
 
-  // Save project (add/edit)
   const handleSave = () => {
     const form = document.getElementById("project-form");
     const formData = new FormData(form);
@@ -79,60 +70,59 @@ const Projects = () => {
       id: editingProject ? editingProject.id : Date.now(),
       name: formData.get("name"),
       description: formData.get("description"),
-      assignedUsers: assignedUsers,
+      assignedUsers,
       status: formData.get("status"),
       priority: formData.get("priority"),
       startDate: formData.get("startDate"),
       endDate: formData.get("endDate"),
       tasks: editingProject ? editingProject.tasks : [],
     };
-
-    if (editingProject) {
-      setProjects(projects.map((p) => (p.id === data.id ? data : p)));
-    } else {
-      setProjects([...projects, data]);
-    }
-
+    editingProject ? dispatch(updateProject(data)) : dispatch(addProject(data));
     handleCloseModal();
   };
 
   return (
-    <Box sx={{ p: 3, bgcolor: "#d4d2cfff" }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        Projects
-      </Typography>
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, minHeight: "100vh", width: "100%" }}>
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>Projects</Typography>
 
-      {/* Add Project Button */}
-      {isAdmin && (
-        <Button variant="contained" sx={{ mb: 2 }} onClick={() => handleOpenModal()}>
-          Add Project
-        </Button>
-      )}
+      <Box sx={{ display: 'flex', flexDirection: { xs: "column", sm: "row" }, alignItems: { xs: "stretch", sm: "center" }, gap: 2, mb: 2 }}>
+        {isAdmin && (
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "#4caf50", "&:hover": { backgroundColor: "#388e3c" }, width: { xs: "100%", sm: "auto" } }}
+            onClick={() => handleOpenModal()}
+          >
+            Add Project
+          </Button>
+        )}
+        <TextField
+          label="Search Project"
+          value={searchProject}
+          onChange={(e) => setSearchProject(e.target.value)}
+          variant="outlined"
+          size="small"
+          sx={{ width: { xs: "100%", sm: "250px" } }}
+        />
+      </Box>
 
-      {/* Projects Table */}
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ bgcolor: "#ffffff", borderRadius: 2, boxShadow: 3, overflowX: "auto" }}>
+        <Table sx={{ minWidth: 650 }}>
           <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Assigned Users</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Priority</TableCell>
-              <TableCell>Start Date</TableCell>
-              <TableCell>End Date</TableCell>
-              <TableCell>Actions</TableCell>
+            <TableRow sx={{ bgcolor: "#1976d2" }}>
+              {["Name", "Description", "Assigned Users", "Status", "Priority", "Start Date", "End Date", "Actions"].map(header => (
+                <TableCell key={header} sx={{ color: "#fff", fontWeight: 600 }}>{header}</TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {displayedProjects.map((project) => (
-              <TableRow key={project.id}>
+              <TableRow key={project.id} sx={{ "&:hover": { bgcolor: "#f1f1f1" } }}>
                 <TableCell>{project.name}</TableCell>
                 <TableCell>{project.description}</TableCell>
                 <TableCell>
                   <AvatarGroup max={3}>
                     {project.assignedUsers.map((username) => {
-                      const user = users.find((u) => u.username === username);
+                      const user = users.find(u => u.username === username);
                       if (!user) return null;
                       return <Avatar key={user.id} src={user.img} alt={user.username} />;
                     })}
@@ -145,10 +135,10 @@ const Projects = () => {
                 <TableCell>
                   {isAdmin && (
                     <>
-                      <IconButton onClick={() => handleOpenModal(project)}>
+                      <IconButton color="primary" onClick={() => handleOpenModal(project)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton onClick={() => handleDelete(project.id)}>
+                      <IconButton color="error" onClick={() => handleDelete(project.id)}>
                         <DeleteIcon />
                       </IconButton>
                     </>
@@ -165,87 +155,34 @@ const Projects = () => {
         <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="sm">
           <DialogTitle>{editingProject ? "Edit Project" : "Add Project"}</DialogTitle>
           <DialogContent>
-            <Box
-              component="form"
-              id="project-form"
-              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
-            >
-              <TextField
-                name="name"
-                label="Project Name"
-                defaultValue={editingProject?.name}
-                required
-              />
-              <TextField
-                name="description"
-                label="Description"
-                defaultValue={editingProject?.description}
-                multiline
-                rows={3}
-                required
-              />
-              <TextField
-                select
-                name="status"
-                label="Status"
-                defaultValue={editingProject?.status || "Not Started"}
-              >
-                {statusOptions.map((status) => (
-                  <MenuItem key={status} value={status}>
-                    {status}
-                  </MenuItem>
-                ))}
+            <Box component="form" id="project-form" sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+              <TextField name="name" label="Project Name" defaultValue={editingProject?.name} required fullWidth />
+              <TextField name="description" label="Description" defaultValue={editingProject?.description} multiline rows={3} required fullWidth />
+              <TextField select name="status" label="Status" defaultValue={editingProject?.status || "Not Started"} fullWidth>
+                {statusOptions.map(status => <MenuItem key={status} value={status}>{status}</MenuItem>)}
               </TextField>
-              <TextField
-                select
-                name="priority"
-                label="Priority"
-                defaultValue={editingProject?.priority || "Medium"}
-              >
-                {priorityOptions.map((p) => (
-                  <MenuItem key={p} value={p}>
-                    {p}
-                  </MenuItem>
-                ))}
+              <TextField select name="priority" label="Priority" defaultValue={editingProject?.priority || "Medium"} fullWidth>
+                {priorityOptions.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
               </TextField>
               <TextField
                 select
                 label="Assign Users"
                 value={assignedUsers}
                 onChange={(e) =>
-                  setAssignedUsers(
-                    typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value
-                  )
+                  setAssignedUsers(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)
                 }
                 SelectProps={{ multiple: true }}
+                fullWidth
               >
-                {users
-                  .filter((u) => u.role === "employee")
-                  .map((u) => (
-                    <MenuItem key={u.id} value={u.username}>
-                      {u.username}
-                    </MenuItem>
-                  ))}
+                {users.filter(u => u.role === "employee").map(u => <MenuItem key={u.id} value={u.username}>{u.username}</MenuItem>)}
               </TextField>
-              <TextField
-                type="date"
-                name="startDate"
-                label="Start Date"
-                defaultValue={editingProject?.startDate}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                type="date"
-                name="endDate"
-                label="End Date"
-                defaultValue={editingProject?.endDate}
-                InputLabelProps={{ shrink: true }}
-              />
+              <TextField type="date" name="startDate" label="Start Date" defaultValue={editingProject?.startDate} InputLabelProps={{ shrink: true }} fullWidth />
+              <TextField type="date" name="endDate" label="End Date" defaultValue={editingProject?.endDate} InputLabelProps={{ shrink: true }} fullWidth />
             </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button variant="contained" onClick={handleSave}>
+            <Button variant="contained" sx={{ backgroundColor: "#1976d2", "&:hover": { backgroundColor: "#115293" } }} onClick={handleSave}>
               Save
             </Button>
           </DialogActions>
