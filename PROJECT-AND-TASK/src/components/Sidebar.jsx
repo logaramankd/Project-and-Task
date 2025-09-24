@@ -17,7 +17,7 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
   };
 
   const menuItems = [
-    { name: "Dashboard", icon: <SpaceDashboardIcon />, path: "/" },
+    { name: "Dashboard", icon: <SpaceDashboardIcon />, path: "/dashboard" },
     { name: "Projects", icon: <AccountTreeIcon />, path: "/dashboard/projects" },
     { name: "Tasks", icon: <TaskIcon />, path: "/dashboard/tasks" },
     { name: "Employees", icon: <BadgeIcon />, path: "/dashboard/employees" },

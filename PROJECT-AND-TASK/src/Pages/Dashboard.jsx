@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, Grid, IconButton, Paper, Typography } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 const Dashboard = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"))
   const [mobileopen, setMobileOpen] = useState(false);
@@ -34,26 +35,9 @@ const Dashboard = () => {
             <MenuIcon />
           </IconButton>
         </Box>
-         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h6">Projects</Typography>
-              <Typography variant="h4">2</Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h6">Tasks</Typography>
-              <Typography variant="h4">6</Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h6">Employees</Typography>
-              <Typography variant="h4">5</Typography>
-            </Paper>
-          </Grid>
-        </Grid>
+
+        {/* namma inga than render panna porom */}
+        <Outlet />
       </Box>
     </Box>
   )
