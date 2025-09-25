@@ -35,7 +35,7 @@ const Tasks = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
   const [filterUser, setFilterUser] = useState("");
-  const [mobileStatus, setMobileStatus] = useState("Pending"); // mobile only
+  const [mobileStatus, setMobileStatus] = useState("Pending");
 
   const selectedProject = projects.find((p) => p.id === Number(selectedProjectId));
 
@@ -402,7 +402,7 @@ const Tasks = () => {
                   <Divider
                     orientation="vertical"
                     flexItem
-                    sx={{ display: { xs: "none", sm: "block", borderWidth: "1px", borderColor: "giansboro" } }}
+                    sx={{ display: { xs: "none", sm: "block", borderWidth: "1px", borderColor: "gainsboro" } }}
                   />
                 )}
               </React.Fragment>
