@@ -174,7 +174,7 @@ const Tasks = () => {
         <Button
           variant="contained"
           sx={{
-            mb: 3, "&:hover": { color: "#FB8C00", color: "#fff" }, // Orange 600 on hover
+            mb: 3, "&:hover": {  }, // Orange 600 on hover
             color: "#fff",
           }}
           onClick={() => setOpenModal(true)}
