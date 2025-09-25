@@ -19,7 +19,7 @@ Features
         Projects:
             View, filter, and manage projects.
             Assign employees to projects.
-            ![alt text](image-2.png)
+            ![alt text](image-2.png)![alt text](image-6.png)
 
         Tasks
 
