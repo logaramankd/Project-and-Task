@@ -78,7 +78,7 @@ const DashboardHome = () => {
           p: 3,
           borderRadius: 3,
           boxShadow: 3,
-          background: "linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)",
+          background: "#1976d2",
           color: "#ffffff",
           mb: 4,
         }}
@@ -94,8 +94,8 @@ const DashboardHome = () => {
         <Grid container spacing={2}>
           {[
             { label: "Total Tasks", value: totalTasks, color: "#fff" },
-            { label: "Pending", value: pending, color: "#f39c12" },
-            { label: "In Progress", value: inProgress, color: "#3498db" },
+            { label: "Pending", value: pending, color: "#f35512ff" },
+            { label: "In Progress", value: inProgress, color: "#dbc534ff" },
             { label: "Completed", value: completed, color: "#2ecc71" },
           ].map((item) => (
             <Grid item xs={12} sm={6} md={3} key={item.label}>
