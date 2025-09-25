@@ -7,7 +7,7 @@ A Task Management Dashboard built with React, Redux Toolkit, and Material UI (MU
 Features
 
 Sidebar Navigation
-
+![alt text](image.png)
 Quick navigation between Dashboard (Home), Projects, Tasks, Employees, Analytics (Pie Charts).
 
 Dashboard/Home
