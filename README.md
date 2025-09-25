@@ -6,53 +6,39 @@ A Task Management Dashboard built with React, Redux Toolkit, and Material UI (MU
 
 Features
 
-Sidebar Navigation
-![alt text](image.png)
-Quick navigation between Dashboard (Home), Projects, Tasks, Employees, Analytics (Pie Charts).
+        Sidebar Navigation:
+        ![alt text](image.png)
+        Quick navigation between Dashboard (Home), Projects, Tasks, Employees, Analytics (Pie Charts).
 
-Dashboard/Home
+        Dashboard/Home
+            Overview of tasks, projects, and employee activity.
+            Visual representation via Pie Charts.
 
-Overview of tasks, projects, and employee activity.
+            ![alt text](image-1.png)
 
-Visual representation via Pie Charts.
+        Projects:
+            View, filter, and manage projects.
+            Assign employees to projects.
+            ![alt text](image-2.png)
 
-Projects
+        Tasks
 
-View, filter, and manage projects.
+            Kanban-style view: Pending, In Progress, Completed.
+            Admin can add, edit, delete tasks.
+            Users can update status of assigned tasks.
+            Filters: Project, User, Status, Priority.
+            ![alt text](image-3.png)
+        Employees
+            List of employees.
+            Assign employees to projects and tasks.
+            ![alt text](image-5.png)
+            ![alt text](image-4.png)
 
-Assign employees to projects.
+        Tech Stack
 
-Tasks
-
-Kanban-style view: Pending, In Progress, Completed.
-
-Admin can add, edit, delete tasks.
-
-Users can update status of assigned tasks.
-
-Filters: Project, User, Status, Priority.
-
-Employees
-
-List of employees.
-
-Assign employees to projects and tasks.
-
-Analytics
-
-Pie Charts for tasks by status, priority, or employee workload.
-
-Tech Stack
-
-React
-
-Redux Toolkit
-
-Material UI (MUI)
-
-Recharts (for Pie Charts)
-
-LocalStorage (for logged-in user info)
+            React,Redux Toolkit
+            Material UI (MUI),Recharts (for Pie Charts)
+            LocalStorage (for logged-in user info)
 
 
 
