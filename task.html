@@ -1,169 +1,207 @@
+<!-- 
+
+demo view
+-->
+
+
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Task Management UI</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-    body {
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background-color: #fff9f5;
-        color: #333;
-    }
-
-    .task-board {
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    /* Top bar */
-    .top-bar {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .top-bar select, .top-bar input, .top-bar button {
-        padding: 10px 15px;
-        border-radius: 12px;
-        border: none;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-    }
-
-    .top-bar select, .top-bar input {
-        border: 2px solid #f7c9a6;
-        background: #fffdf8;
-    }
-
-    .top-bar select:hover, .top-bar input:hover {
-        border-color: #ff9966;
-    }
-
-    .top-bar button {
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    .btn-primary {
-        background-color: #ff9966;
-        color: white;
-    }
-    .btn-primary:hover {
-        background-color: #e6733c;
-    }
-
-    .btn-secondary {
-        background-color: #ffe6cc;
-        color: #b34700;
-    }
-    .btn-secondary:hover {
-        background-color: #ffcc99;
-    }
-
-    /* Columns */
-    .columns {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .column {
-        flex: 1;
-        min-width: 280px;
-        background: #fffdf8;
-        border-radius: 16px;
-        padding: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .column h3 {
-        margin: 0 0 10px;
-        color: #b34700;
-        font-size: 1.2rem;
-    }
-
-    /* Task cards */
-    .task-card {
-        background: white;
-        border-radius: 14px;
-        padding: 12px 15px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        transition: transform 0.2s, box-shadow 0.2s;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .task-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    }
-
-    .task-card h4 {
-        margin: 0;
-        font-weight: 600;
-        font-size: 1rem;
-    }
-
-    .assigned {
-        font-size: 0.85rem;
-        color: #666;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin-top: 4px;
-        width: fit-content;
-    }
-
-    .low { background-color: #d8f3dc; color: #267326; }
-    .medium { background-color: #ffe6cc; color: #b34700; }
-    .high { background-color: #ffd6cc; color: #b32400; }
-
-    /* Actions */
-    .actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 8px;
-    }
-
-    .actions button {
-        padding: 6px 12px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: 0.2s;
-    }
-
-    .edit-btn { background-color: #e9c46a; color: #5a3e2b; }
-    .edit-btn:hover { background-color: #d4b35f; }
-
-    .delete-btn { background-color: #e76f51; color: white; }
-    .delete-btn:hover { background-color: #d65a3f; }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-        .columns {
-            flex-direction: column;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff9f5;
+            color: #333;
         }
-    }
-</style>
+
+        .task-board {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top bar */
+        .top-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .top-bar select,
+        .top-bar input,
+        .top-bar button {
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .top-bar select,
+        .top-bar input {
+            border: 2px solid #f7c9a6;
+            background: #fffdf8;
+        }
+
+        .top-bar select:hover,
+        .top-bar input:hover {
+            border-color: #ff9966;
+        }
+
+        .top-bar button {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: #ff9966;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6733c;
+        }
+
+        .btn-secondary {
+            background-color: #ffe6cc;
+            color: #b34700;
+        }
+
+        .btn-secondary:hover {
+            background-color: #ffcc99;
+        }
+
+        /* Columns */
+        .columns {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 280px;
+            background: #fffdf8;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .column h3 {
+            margin: 0 0 10px;
+            color: #b34700;
+            font-size: 1.2rem;
+        }
+
+        /* Task cards */
+        .task-card {
+            background: white;
+            border-radius: 14px;
+            padding: 12px 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .task-card h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .assigned {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 4px;
+            width: fit-content;
+        }
+
+        .low {
+            background-color: #d8f3dc;
+            color: #267326;
+        }
+
+        .medium {
+            background-color: #ffe6cc;
+            color: #b34700;
+        }
+
+        .high {
+            background-color: #ffd6cc;
+            color: #b32400;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .actions button {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .edit-btn {
+            background-color: #e9c46a;
+            color: #5a3e2b;
+        }
+
+        .edit-btn:hover {
+            background-color: #d4b35f;
+        }
+
+        .delete-btn {
+            background-color: #e76f51;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #d65a3f;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .columns {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
+
 <body>
     <div class="task-board">
         <!-- Top bar -->
@@ -248,4 +286,5 @@
         </div>
     </div>
 </body>
+
 </html>
