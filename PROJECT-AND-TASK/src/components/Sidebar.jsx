@@ -27,7 +27,7 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
     <Box
       sx={{
         width: { xs: 220, sm: 240 },
-        bgcolor: "#263238", // professional dark gray/blue
+        background: "linear-gradient(to bottom, #6329c0ff, #548bf1ff)", // professional dark gray/blue
         color: "#ffffff",
         height: "100%",
         p: 2,
@@ -81,17 +81,20 @@ const Sidebar = ({ mobileopen, handleSidebar, username }) => {
         fullWidth
         sx={{
           gap: 2,
-          bgcolor: "#d32f2f",       // professional deep red
-          "&:hover": { bgcolor: "#b71c1c" },
+          bgcolor: "#4db6ac",       // slightly darker than gradient bottom
+          "&:hover": { bgcolor: "#2A5EA0", color: "#fff" },
           color: "#fff",
+          borderRadius:1,
           textTransform: "none",
         }}
       >
-        <IconButton sx={{ color: "#fff" }}>
+        <IconButton sx={{ color: "#fff", "&:hover": { color: "#fff" } }}>
           <LogoutIcon />
         </IconButton>
         Logout
       </Button>
+
+
     </Box>
   );
 

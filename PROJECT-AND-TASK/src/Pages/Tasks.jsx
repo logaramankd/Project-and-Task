@@ -103,7 +103,7 @@ const Tasks = () => {
       </Typography>
 
       {/* Filters Section */}
-      <Grid container spacing={2} sx={{ mb: 3, p: 2, bgcolor: "#1976d2", borderRadius: 2, boxShadow: 2 }}>
+      <Grid container spacing={2} sx={{ mb: 3, p: 2, background: "linear-gradient(to right, #6329c0ff, #548bf1ff)", borderRadius: 2, boxShadow: 2 }}>
         <Grid item xs={12} sm={3}>
           <FormControl fullWidth>
             <InputLabel>Project</InputLabel>
@@ -173,7 +173,10 @@ const Tasks = () => {
       {isAdmin && selectedProjectId !== "all" && selectedProject && (
         <Button
           variant="contained"
-          sx={{ mb: 3, backgroundColor: "#f44336", "&:hover": { backgroundColor: "#d32f2f" } }}
+          sx={{
+            mb: 3, "&:hover": { color: "#FB8C00", color: "#fff" }, // Orange 600 on hover
+            color: "#fff",
+          }}
           onClick={() => setOpenModal(true)}
         >
           Add Task
@@ -284,6 +287,11 @@ const Tasks = () => {
                           justifyContent: "space-between",
                           transition: "0.3s",
                           "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
+                          borderBottomColor: status === "Pending"
+                            ? "#FF9800"
+                            : status === "In Progress"
+                              ? "#2196F3"
+                              : "#4CAF50"
                         }}
                       >
                         <Box>
@@ -315,18 +323,19 @@ const Tasks = () => {
                             variant="body1"
                             sx={{
                               mb: 1,
-                              fontSize: "0.9rem",
+                              fontSize: "1.1rem",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
                               display: "-webkit-box",
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: "vertical",
+                              fontWeight: 600
                             }}
                           >
-                            {task.title} <span style={{ fontWeight: 600 }}>▼</span>
+                            {task.title} <span style={{ fontWeight: 600, }}>▼</span>
                           </Typography>
 
-                          <Typography variant="body2" sx={{ mb: 1 }}>
+                          <Typography variant="body2" sx={{ mb: 1, color: "dimgrey" }}>
                             Assigned: {task.assignedUser}
                           </Typography>
 
@@ -346,37 +355,42 @@ const Tasks = () => {
                               <MenuItem value="Completed">Completed</MenuItem>
                             </Select>
                           </FormControl>
-
-                          <Typography variant="body2" sx={{ mb: 1 }}>
-                            Priority: {task.priority}
-                          </Typography>
                         </Box>
 
                         {isAdmin && (
                           <Box
                             sx={{
                               display: "flex",
-                              justifyContent: "flex-end",
+                              justifyContent: "space-between",
+                              alignItems: 'center',
                               gap: 1,
                             }}
                           >
-                            <Button
-                              size="small"
-                              variant="contained"
-                              onClick={() => handleEditTask(task.id, task.projectId)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              color="error"
-                              onClick={() =>
-                                handleDeleteTask(task.id, task.projectId)
-                              }
-                            >
-                              Delete
-                            </Button>
+                            <Box>
+                              <Typography variant="body2" sx={{ mb: 1 }}>
+                                Priority: {task.priority}
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                              <Button
+                                size="small"
+                                variant="contained"
+                                onClick={() => handleEditTask(task.id, task.projectId)}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                color="error"
+                                onClick={() =>
+                                  handleDeleteTask(task.id, task.projectId)
+                                }
+                              >
+                                Delete
+                              </Button>
+                            </Box>
                           </Box>
                         )}
                       </Paper>

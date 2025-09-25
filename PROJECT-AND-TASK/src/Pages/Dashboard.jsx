@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, IconButton, Typography } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-
+import logo from '../../public/images/image.png'
 const Dashboard = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   const [mobileopen, setMobileOpen] = useState(false);
@@ -12,9 +12,9 @@ const Dashboard = () => {
   const handleSidebar = () => {
     setMobileOpen(!mobileopen);
   };
-
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f5f5',color:"#3f3b3bff" }}>
+
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f5f5', color: "#3f3b3bff" }}>
       {/* Sidebar */}
       <Sidebar
         mobileopen={mobileopen}
@@ -29,7 +29,7 @@ const Dashboard = () => {
           display: 'flex',
           flexDirection: 'column',
           height: '100vh',
-          
+
         }}
       >
         {/* Top Bar */}
@@ -44,7 +44,7 @@ const Dashboard = () => {
             boxShadow: 1,
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 600}}>
+          <Typography variant="h5" sx={{ fontWeight: 600 }}>
             Project and Task Management
           </Typography>
           <IconButton
@@ -53,6 +53,17 @@ const Dashboard = () => {
           >
             <MenuIcon />
           </IconButton>
+          <Box
+            component="img"
+            src={logo}
+            alt="Logo"
+            sx={{
+              display: { xs: 'none', sm: 'block' }, // hidden on mobile (xs), visible on sm+ (desktop)
+              height: 40, // optional: adjust size
+              ml: 2 // optional: margin-left
+            }}
+          />
+
         </Box>
 
         {/* Scrollable Content */}

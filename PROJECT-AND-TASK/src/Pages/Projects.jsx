@@ -126,8 +126,11 @@ const Projects = () => {
         {isAdmin && (
           <Button
             variant="contained"
-            sx={{ backgroundColor: "#4caf50", "&:hover": { backgroundColor: "#388e3c" }, width: { xs: "100%", sm: "auto" } }}
-            onClick={() => handleOpenModal()}
+            sx={{
+              backgroundColor: "#FF9800",  // Orange 500
+              "&:hover": { color: "#FB8C00",bgcolor:"#fff" }, // Orange 600
+              width: { xs: "100%", sm: "auto" }
+            }} onClick={() => handleOpenModal()}
           >
             Add Project
           </Button>
@@ -189,7 +192,7 @@ const Projects = () => {
         <TableContainer component={Paper} sx={{ bgcolor: "#ffffff", borderRadius: 2, boxShadow: 3, overflowX: "auto" }}>
           <Table sx={{ minWidth: 650 }}>
             <TableHead>
-              <TableRow sx={{ bgcolor: "#1976d2" }}>
+              <TableRow sx={{ background: "linear-gradient(to right, #6329c0ff, #548bf1ff)" }}>
                 {["Name", "Description", "Assigned Users", "Status", "Priority", "Start Date", "End Date", "Actions"].map(header => (
                   <TableCell key={header} sx={{ color: "#fff", fontWeight: 600 }}>{header}</TableCell>
                 ))}

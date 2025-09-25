@@ -78,7 +78,7 @@ const DashboardHome = () => {
           p: 3,
           borderRadius: 3,
           boxShadow: 3,
-          background: "linear-gradient(to right, #2968c0ff, #6f99d3ff)", // warm gradient
+          background: "linear-gradient(to right, #6329c0ff, #548bf1ff)", // warm gradient
           color: "#ffffff",
           mb: 4,
         }}

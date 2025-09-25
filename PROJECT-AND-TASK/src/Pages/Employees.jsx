@@ -50,7 +50,7 @@ const Employee = () => {
             }}
           >
             <Table>
-              <TableHead sx={{ bgcolor: "#1976d2", }}>
+              <TableHead sx={{ background: "linear-gradient(to right, #6329c0ff, #548bf1ff)", }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600,color:"white" }}>Avatar</TableCell>
                   <TableCell sx={{ fontWeight: 600,color:"white" }}>Name</TableCell>
