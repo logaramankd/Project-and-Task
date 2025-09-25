@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Box, IconButton, Typography } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import logo from '../../public/images/image.png'
+import logo from '/images/image.png'
 const Dashboard = () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   const [mobileopen, setMobileOpen] = useState(false);
