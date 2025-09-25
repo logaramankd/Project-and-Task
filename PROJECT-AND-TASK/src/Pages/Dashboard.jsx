@@ -14,7 +14,7 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f5f5',color:"#3f3b3bff" }}>
       {/* Sidebar */}
       <Sidebar
         mobileopen={mobileopen}
@@ -29,6 +29,7 @@ const Dashboard = () => {
           display: 'flex',
           flexDirection: 'column',
           height: '100vh',
+          
         }}
       >
         {/* Top Bar */}
@@ -43,7 +44,7 @@ const Dashboard = () => {
             boxShadow: 1,
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600}}>
             Project and Task Management
           </Typography>
           <IconButton

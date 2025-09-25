@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Divider
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { addTask, updateTask, deleteTask, selectProjects } from "../redux/slices/projectsSlice";
@@ -102,7 +103,7 @@ const Tasks = () => {
       </Typography>
 
       {/* Filters Section */}
-      <Grid container spacing={2} sx={{ mb: 3, p: 2, bgcolor: "#fff", borderRadius: 2, boxShadow: 2 }}>
+      <Grid container spacing={2} sx={{ mb: 3, p: 2, bgcolor: "#1976d2", borderRadius: 2, boxShadow: 2 }}>
         <Grid item xs={12} sm={3}>
           <FormControl fullWidth>
             <InputLabel>Project</InputLabel>
@@ -185,7 +186,10 @@ const Tasks = () => {
         <Box sx={{ display: { xs: "block", sm: "none" }, mb: 2 }}>
           <FormControl fullWidth>
             <InputLabel>Status</InputLabel>
-            <Select value={mobileStatus} onChange={(e) => setMobileStatus(e.target.value)}>
+            <Select
+              value={mobileStatus}
+              onChange={(e) => setMobileStatus(e.target.value)}
+            >
               <MenuItem value="Pending">Pending</MenuItem>
               <MenuItem value="In Progress">In Progress</MenuItem>
               <MenuItem value="Completed">Completed</MenuItem>
@@ -196,122 +200,203 @@ const Tasks = () => {
         <Box
           sx={{
             display: "flex",
-            gap: 3,
+            gap: 2,
             justifyContent: "space-between",
             flexDirection: { xs: "column", sm: "row" },
           }}
         >
-          {["Pending", "In Progress", "Completed"].map((status, index) => {
+          {["Pending", "In Progress", "Completed"].map((status, index, arr) => {
             if (window.innerWidth < 600 && status !== mobileStatus) return null; // mobile only selected status
 
+            const statusColor =
+              status === "Pending"
+                ? "#FF9800"
+                : status === "In Progress"
+                  ? "#2196F3"
+                  : "#4CAF50";
+
+            const taskCount = filteredTasks.filter(
+              (task) => task.status === status
+            ).length;
+
             return (
-              <Box
-                key={status}
-                sx={{
-                  flex: 1,
-                  minWidth: 250,
-                  bgcolor: "#f7f7f7",
-                  borderRadius: 2,
-                  p: 2,
-                  maxHeight: "80vh",
-                  overflowY: "auto",
-                }}
-              >
-                <Typography
-                  variant="h6"
+              <React.Fragment key={status}>
+                {/* Column */}
+                <Box
                   sx={{
-                    mb: 2,
-                    textAlign: "center",
-                    border: "1px solid black",
-                    fontWeight: 600,
-                    bgcolor:
-                      status === "Pending"
-                        ? "orange"
-                        : status === "In Progress"
-                          ? "yellow"
-                          : "green",
+                    flex: 1,
+                    minWidth: 250,
+                    bgcolor: "#f7f7f7",
+                    borderRadius: 2,
+                    p: 2,
+                    maxHeight: "80vh",
+                    overflowY: "auto",
+                    // hide scrollbar cross-browser
+                    scrollbarWidth: "none", // Firefox
+                    "&::-webkit-scrollbar": { display: "none" }, // Chrome, Safari
+                    msOverflowStyle: "none", // IE + Edge
                   }}
                 >
-                  {status}
-                </Typography>
-
-                {filteredTasks
-                  .filter((task) => task.status === status)
-                  .map((task) => (
-                    <Paper
-                      key={task.id}
+                  {/* Professional Status Header */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mb: 2,
+                      px: 1.5,
+                      py: 1,
+                      borderRadius: 2,
+                      bgcolor: "#f9f9f9",
+                      boxShadow: "inset 0 -1px 0 rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    <Box
                       sx={{
-                        p: 2,
-                        mb: 2,
-                        borderRadius: 2,
-                        width: "100%",
-                        minHeight: 200,
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        transition: "0.3s",
-                        "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        mr: 1.5,
+                        bgcolor: statusColor,
                       }}
+                    />
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 600, color: "#2D3748" }}
                     >
-                      <Box>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                          {selectedProjectId === "all" && <Typography variant="subtitle2">{task.projectName}</Typography>}
-                          <Typography variant="caption" sx={{ bgcolor: "gainsboro", p: 1, borderRadius: 2 }}>
-                            24hrs ago
+                      {status} ({taskCount})
+                    </Typography>
+                  </Box>
+
+                  {/* Task Cards */}
+                  {filteredTasks
+                    .filter((task) => task.status === status)
+                    .map((task) => (
+                      <Paper
+                        key={task.id}
+                        sx={{
+                          p: 2,
+                          mb: 2,
+                          borderRadius: 2,
+                          width: "100%",
+                          minHeight: 200,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          transition: "0.3s",
+                          "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
+                        }}
+                      >
+                        <Box>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              mb: 1,
+                            }}
+                          >
+                            {selectedProjectId === "all" && (
+                              <Typography variant="subtitle2">
+                                {task.projectName}
+                              </Typography>
+                            )}
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                bgcolor: "gainsboro",
+                                p: 1,
+                                borderRadius: 2,
+                              }}
+                            >
+                              24hrs ago
+                            </Typography>
+                          </Box>
+
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              mb: 1,
+                              fontSize: "0.9rem",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                            }}
+                          >
+                            {task.title} <span style={{ fontWeight: 600 }}>▼</span>
+                          </Typography>
+
+                          <Typography variant="body2" sx={{ mb: 1 }}>
+                            Assigned: {task.assignedUser}
+                          </Typography>
+
+                          <FormControl fullWidth sx={{ mb: 1 }}>
+                            <Select
+                              value={task.status}
+                              onChange={(e) =>
+                                handleEditTask(
+                                  task.id,
+                                  task.projectId,
+                                  e.target.value
+                                )
+                              }
+                            >
+                              <MenuItem value="Pending">Pending</MenuItem>
+                              <MenuItem value="In Progress">In Progress</MenuItem>
+                              <MenuItem value="Completed">Completed</MenuItem>
+                            </Select>
+                          </FormControl>
+
+                          <Typography variant="body2" sx={{ mb: 1 }}>
+                            Priority: {task.priority}
                           </Typography>
                         </Box>
 
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            mb: 1,
-                            fontSize: "0.9rem",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {task.title} <span style={{ fontWeight: 600 }}>▼</span>
-                        </Typography>
+                        {isAdmin && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                              gap: 1,
+                            }}
+                          >
+                            <Button
+                              size="small"
+                              variant="contained"
+                              onClick={() => handleEditTask(task.id, task.projectId)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="error"
+                              onClick={() =>
+                                handleDeleteTask(task.id, task.projectId)
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </Box>
+                        )}
+                      </Paper>
+                    ))}
+                </Box>
 
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                          Assigned: {task.assignedUser}
-                        </Typography>
-
-                        <FormControl fullWidth sx={{ mb: 1 }}>
-                          <Select value={task.status} onChange={(e) => handleEditTask(task.id, task.projectId, e.target.value)}>
-                            <MenuItem value="Pending">Pending</MenuItem>
-                            <MenuItem value="In Progress">In Progress</MenuItem>
-                            <MenuItem value="Completed">Completed</MenuItem>
-                          </Select>
-                        </FormControl>
-
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                          Priority: {task.priority}
-                        </Typography>
-                      </Box>
-
-                      {isAdmin && (
-                        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-                          <Button size="small" variant="contained" onClick={() => handleEditTask(task.id, task.projectId)}>
-                            Edit
-                          </Button>
-                          <Button size="small" variant="outlined" color="error" onClick={() => handleDeleteTask(task.id, task.projectId)}>
-                            Delete
-                          </Button>
-                        </Box>
-                      )}
-                    </Paper>
-                  ))}
-              </Box>
-
+                {/* Divider*/}
+                {index < arr.length - 1 && (
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{ display: { xs: "none", sm: "block", borderWidth: "1px", borderColor: "giansboro" } }}
+                  />
+                )}
+              </React.Fragment>
             );
           })}
         </Box>
-      </Box>
 
+      </Box>
       {/* Add Task Modal */}
       <Dialog open={openModal} onClose={() => setOpenModal(false)} fullWidth maxWidth="sm">
         <DialogTitle>Add Task</DialogTitle>

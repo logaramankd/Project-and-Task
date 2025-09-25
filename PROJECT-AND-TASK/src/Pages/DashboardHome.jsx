@@ -78,7 +78,7 @@ const DashboardHome = () => {
           p: 3,
           borderRadius: 3,
           boxShadow: 3,
-          background: "#1976d2",
+          background: "linear-gradient(to right, #2968c0ff, #6f99d3ff)", // warm gradient
           color: "#ffffff",
           mb: 4,
         }}
@@ -94,9 +94,9 @@ const DashboardHome = () => {
         <Grid container spacing={2}>
           {[
             { label: "Total Tasks", value: totalTasks, color: "#fff" },
-            { label: "Pending", value: pending, color: "#f35512ff" },
-            { label: "In Progress", value: inProgress, color: "#dbc534ff" },
-            { label: "Completed", value: completed, color: "#2ecc71" },
+            { label: "Pending", value: pending, color: "#fff" },
+            { label: "In Progress", value: inProgress, color: "#fff" },
+            { label: "Completed", value: completed, color: "#fff" },
           ].map((item) => (
             <Grid item xs={12} sm={6} md={3} key={item.label}>
               <Box
@@ -107,6 +107,7 @@ const DashboardHome = () => {
                   transition: "0.3s",
                   textAlign: "center",
                   "&:hover": { backgroundColor: "rgba(255,255,255,0.25)" },
+                  
                 }}
               >
                 <Typography variant="subtitle2">{item.label}</Typography>
@@ -134,6 +135,7 @@ const DashboardHome = () => {
               boxShadow: 3,
               transition: "0.3s",
               "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
+              
             }}
           >
             <Typography variant="h6" sx={{ mb: 2 }}>
